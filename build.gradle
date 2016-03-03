@@ -1,0 +1,95 @@
+apply plugin: 'java'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
+// 这个version是区分library版本的，因此当我们需要更新library时记得修改这个version
+version = "0.0.1"
+group = "com.zyl.filemd5utils" // Maven Group ID for the artifact，一般填你唯一的包名
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+// maven jar
+def siteUrl = 'https://github.com/fxtxz2/file-md5-utils'    // project homepage
+def gitUrl = 'https://github.com/fxtxz2/file-md5-utils.git' // project git
+
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            groupId group
+            artifactId 'filemd5utils'
+            version version
+
+            artifact sourcesJar
+            artifact javadocJar
+            pom.withXml {
+                asNode().appendNode('name', 'filemd5utils')
+                asNode().appendNode('description', 'File key from URL')
+                asNode().appendNode('url', siteUrl)
+
+                def licenseNode = asNode().appendNode('licenses').appendNode('license')
+                licenseNode.appendNode('name', 'The Apache Software License, Version 2.0')
+                licenseNode.appendNode('url', 'http://www.apache.org/license/LICENSE-2.0.txt')
+//                licenseNode.appendNode('distribution', PROJ_LICENCE_DEST)
+
+                def developerNode = asNode().appendNode('developers').appendNode('developer')
+                developerNode.appendNode('id', 'Zhang Ya Lin')
+                developerNode.appendNode('name', 'Zhang Ya Lin')
+                developerNode.appendNode('email', 'zylstc2009@gmail.com')
+
+
+                def scmNode = asNode().appendNode('scm')
+                scmNode.appendNode('connection', gitUrl)
+                scmNode.appendNode('developerConnection', gitUrl)
+                scmNode.appendNode('url', siteUrl)
+            }
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            // change to point to your repo, e.g. http://my.org/repo
+            url 'http://dl.bintray.com/zyl/maven'
+        }
+    }
+}
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+javadoc {
+    options{
+        encoding 'UTF-8'
+        charSet 'UTF-8'
+        author true
+    }
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+// bintray
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+//    configurations = ['archives']
+    publications = ['MyPublication']
+    pkg {
+        repo = 'maven'
+        name = 'file-md5-utils'
+        licenses = ['Apache-2.0']
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        publish = true
+    }
+}
