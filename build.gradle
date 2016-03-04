@@ -1,8 +1,11 @@
 apply plugin: 'java'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'maven-publish'
+// 一直到Android 6.0，Android Studio到1.5.1版，仍然不支持Java 8
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 // 这个version是区分library版本的，因此当我们需要更新library时记得修改这个version
-version = "0.0.1"
+version = "0.0.2"
 group = "com.zyl.filemd5utils" // Maven Group ID for the artifact，一般填你唯一的包名
 
 dependencies {
@@ -16,6 +19,7 @@ def gitUrl = 'https://github.com/fxtxz2/file-md5-utils.git' // project git
 publishing {
     publications {
         MyPublication(MavenPublication) {
+            from components.java
             groupId group
             artifactId 'filemd5utils'
             version version
@@ -43,19 +47,12 @@ publishing {
                 scmNode.appendNode('developerConnection', gitUrl)
                 scmNode.appendNode('url', siteUrl)
             }
-            from components.java
-        }
-    }
-    repositories {
-        maven {
-            // change to point to your repo, e.g. http://my.org/repo
-            url 'http://dl.bintray.com/zyl/maven'
         }
     }
 }
 task sourcesJar(type: Jar) {
     classifier = 'sources'
-    from sourceSets.main.allJava
+    from sourceSets.main.java.srcDirs
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {

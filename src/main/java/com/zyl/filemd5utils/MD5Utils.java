@@ -22,6 +22,7 @@ public class MD5Utils {
             mDigest.update(key.getBytes());
             cacheKey = bytesToHexString(mDigest.digest());
         } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
             cacheKey = String.valueOf(key.hashCode());
         }
         return cacheKey;
