@@ -8,4 +8,4 @@ url：表示图片的URl；
 key：生成的key，从缓存中获取图片需要再使用。
 
 # Gradle引入
-`compile 'com.zyl.filemd5utils:filemd5utils:0.0.1'`
+`compile 'com.zyl.filemd5utils:filemd5utils:0.0.2'`
